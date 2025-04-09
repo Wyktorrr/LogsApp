@@ -19,32 +19,46 @@ public class LogFileValidationTest {
 
     @BeforeEach
     public void setUp() {
-        // Additional setup if needed
     }
 
     @Test
     public void testFileNotEmpty() throws IOException {
+        // Given: A path to the log file
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
-        assertNotNull(reader.readLine(),
-                "The log file should not be empty");
+
+        // When: Reading the first line
+        String firstLine = reader.readLine();
+
+        // Then: The log file should not be empty
+        assertNotNull(firstLine, "The log file should not be empty");
         reader.close();
     }
 
     @Test
     public void testFileName() {
-        assertTrue(LOG_FILE_PATH.endsWith("logs.log"),
-                "The log file must be named 'logs.log'");
+        // Given: The expected log file name
+        String expectedFileName = "logs.log";
+
+        // Then: The log file must be named 'logs.log'
+        assertTrue(LOG_FILE_PATH.endsWith(expectedFileName),
+                "The log file must be named '" + expectedFileName + "'");
     }
 
     @Test
     public void testEmptyValues() throws IOException {
+        // Given: A file reader for the log file
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         String line;
+
+        // When: Iterating through each line in the file
+        int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
+            lineNumber++;
             String[] parts = line.split(", ");
             for (String part : parts) {
+                // Then: Each log entry should not have empty values
                 assertFalse(part.trim().isEmpty(),
-                        "Log entries should not have empty values");
+                        "Log entry on line " + lineNumber + " should not have empty values.");
             }
         }
         reader.close();
@@ -52,13 +66,19 @@ public class LogFileValidationTest {
 
     @Test
     public void testNullValues() throws IOException {
+        // Given: A file reader for the log file
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         String line;
+
+        // When: Iterating through each line in the file
+        int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
+            lineNumber++;
             String[] parts = line.split(", ");
             for (String part : parts) {
+                // Then: Each log entry should not have null values
                 assertNotNull(part,
-                        "Log entries should not have null values");
+                        "Log entry on line " + lineNumber + " should not have null values.");
             }
         }
         reader.close();
@@ -66,81 +86,75 @@ public class LogFileValidationTest {
 
     @Test
     public void testInputFormatConsistency() throws IOException {
+        // Given: A file reader for the log file
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         String line;
+
+        // When: Iterating through each line in the file
+        int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
-            // Use regex to split by comma and any amount of whitespace
+            lineNumber++;
             String[] parts = line.split(",\\s*");
 
+            // Then: Each log entry should have exactly four components
             assertEquals(4, parts.length,
-                    "Each log entry should have exactly four components");
+                    "Log entry on line " + lineNumber + " should have exactly four components.");
 
-            // Check timestamp format HH:MM:SS
+            // Validate timestamp format HH:MM:SS
             try {
                 LocalTime.parse(parts[0]); // Validate that parsing succeeds
             } catch (Exception e) {
-                fail("Timestamp format is invalid: " + parts[0]);
+                fail("Log entry on line " + lineNumber + " has an invalid timestamp format: " + parts[0]);
             }
 
             // Check job description format
             assertTrue(parts[1].matches("scheduled task \\d{3}|background job [a-z]{3}"),
-                    "Job description must match the required format");
+                    "Log entry on line " + lineNumber + " job description must match the required format");
 
             // Check START/END status
             assertTrue("START".equals(parts[2]) || "END".equals(parts[2]),
-                    "Status must be either 'START' or 'END'");
+                    "Log entry on line " + lineNumber + " status must be either 'START' or 'END'");
 
             // Check that PID is a 5-digit number
             assertTrue(parts[3].matches("\\d{5}"),
-                    "PID must be a 5-digit number");
+                    "Log entry on line " + lineNumber + " PID must be a 5-digit number");
         }
         reader.close();
     }
 
     @Test
     public void testDuplicateEntries() throws IOException {
+        // Given: A file reader for the log file and a set to track entries
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         Set<String> entriesSet = new HashSet<>();
         String line;
         boolean hasDuplicates = false;
+        int lineNumber = 0;
 
+        // When: Iterating through each line in the file to check for duplicates
         while ((line = reader.readLine()) != null) {
+            lineNumber++;
             if (!entriesSet.add(line.trim())) { // If the entry is already in the set, we have a duplicate
                 hasDuplicates = true;
                 break;
             }
         }
 
-        assertFalse(hasDuplicates,
-                "The log file should not contain duplicate entries");
-        reader.close();
-    }
-
-    @Test
-    public void testSpacingConsistency() throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // This split allows for varying spacing
-            String[] parts = line.split(",\\s*"); // Split by "," and ignore spaces
-
-            assertEquals(4, parts.length,
-                    "Each log entry should have exactly four components");
-
-            // Ensure the third component must be "START" or "END" and validate its format
-            assertTrue("START".equals(parts[2]) || "END".equals(parts[2]),
-                    "The status must be either 'START' or 'END'");
-        }
+        // Then: The log file should not contain duplicate entries
+        assertFalse(hasDuplicates, "The log file should not contain duplicate entries on line " + lineNumber);
         reader.close();
     }
 
     @Test
     public void testAllProcessesHaveBothStartAndEnd() throws IOException {
+        // Given: A buffered reader for the log file to track START and END entries
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         Map<Integer, Boolean> hasStart = new HashMap<>();
         Map<Integer, Boolean> hasEnd = new HashMap<>();
 
         String line;
+
+        // When: Iterating through each line in the log file
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",\\s*");
             int pid = Integer.parseInt(parts[3]);
@@ -150,18 +164,26 @@ public class LogFileValidationTest {
             if ("START".equals(status)) {
                 hasStart.put(pid, true);
             } else if ("END".equals(status) && !hasStart.containsKey(pid)) {
-                // If there is an END without a corresponding START
+                // Mark END without a corresponding START
                 hasEnd.put(pid, false);
             } else {
-                // Only mark the END if there was at least one START
+                // Mark END as true only if there was a corresponding START
                 hasEnd.put(pid, true);
             }
         }
 
-        // Verify that each process has both START and END entries
+        // Then: Verify that each process has both START and END entries
         for (Integer pid : hasStart.keySet()) {
+            // Fail if there is no corresponding END for a valid START
             assertTrue(hasStart.get(pid), "Process with PID: " + pid + " must have a START entry.");
             assertTrue(hasEnd.getOrDefault(pid, false), "Process with PID: " + pid + " must have an END entry.");
+        }
+
+        // Additional check: If there's an END for a PID, there must also be a START for it
+        for (Integer pid : hasEnd.keySet()) {
+            if (!hasEnd.get(pid)) {
+                fail("Process with PID: " + pid + " has an END entry without a corresponding START.");
+            }
         }
 
         reader.close();
@@ -169,11 +191,14 @@ public class LogFileValidationTest {
 
     @Test
     public void testEndDateAfterStartDate() throws IOException {
+        // Given: A file reader for the log file to track start and end dates
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         Map<Integer, LocalTime> startTimes = new HashMap<>();
         Map<Integer, LocalTime> endTimes = new HashMap<>();
 
         String line;
+
+        // When: Iterating through each line in the log file
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",\\s*");
             int pid = Integer.parseInt(parts[3]);
@@ -187,14 +212,13 @@ public class LogFileValidationTest {
             }
         }
 
+        // Then: Verify that the END time is after the START time for each process
         for (Integer pid : startTimes.keySet()) {
             LocalTime startTime = startTimes.get(pid);
             LocalTime endTime = endTimes.get(pid);
 
-            if (endTime != null) { // Ensure there's an end time for the PID
-                assertTrue(endTime.isAfter(startTime),
-                        "The END time must be after the START time for PID: " + pid);
-            }
+            assertNotNull(endTime, "Process with PID: " + pid + " must have an END time recorded.");
+            assertTrue(endTime.isAfter(startTime), "The END time must be after the START time for PID: " + pid);
         }
 
         reader.close();
@@ -202,11 +226,13 @@ public class LogFileValidationTest {
 
     @Test
     public void testJobDescriptionAndPIDConsistency() throws IOException {
+        // Given: A file reader for the log file to check job description and PID
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         Map<Integer, String> startJobDescriptions = new HashMap<>();
         Map<Integer, String> endJobDescriptions = new HashMap<>();
-
         String line;
+
+        // When: Iterating through each line in the file
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",\\s*");
             int pid = Integer.parseInt(parts[3]);
@@ -220,6 +246,7 @@ public class LogFileValidationTest {
             }
         }
 
+        // Then: Verify that job descriptions match for START and END entries for each PID
         for (Integer pid : startJobDescriptions.keySet()) {
             String startJobDescription = startJobDescriptions.get(pid);
             String endJobDescription = endJobDescriptions.get(pid);
