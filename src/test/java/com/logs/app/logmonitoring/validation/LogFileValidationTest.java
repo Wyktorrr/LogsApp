@@ -1,7 +1,6 @@
 package com.logs.app.logmonitoring.validation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,10 +10,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-public class LogFileValidationTest {
+class LogFileValidationTest {
     private static final String LOG_FILE_PATH = "src/test/resources/logs.log";
 
     @BeforeEach
