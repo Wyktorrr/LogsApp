@@ -1,15 +1,14 @@
 package com.logs.app.logmonitoring.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.logs.app.logmonitoring.model.ProcessJob;
+import java.time.Duration;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.LocalTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class LogProcessingTest {
+class LogProcessingTest {
     private ProcessJob mockProcessLongWarning; // Process with duration leading to WARNING
     private ProcessJob mockProcessLongError;   // Process with duration leading to ERROR
     private ProcessJob mockProcessShort;       // Process with duration less than 5 minutes
