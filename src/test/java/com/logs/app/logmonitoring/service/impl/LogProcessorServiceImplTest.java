@@ -1,7 +1,11 @@
-package com.logs.app.logmonitoring.service;
+package com.logs.app.logmonitoring.service.impl;
 
 import static com.logs.app.logmonitoring.validation.LogFileValidation.validateEntry;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import com.logs.app.logmonitoring.model.ProcessJob;
@@ -12,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class LogProcessorTest {
+class LogProcessorServiceImplTest {
 
     private static Object[][] provideLogDurations() {
         return new Object[][]{
@@ -25,12 +29,12 @@ class LogProcessorTest {
         };
     }
 
-    private LogProcessor logProcessor;
+    private LogProcessorServiceImpl logProcessor;
     String filePath = "src/test/resources/logs.log";
 
     @BeforeEach
     void setUp() {
-        logProcessor = new LogProcessor();
+        logProcessor = new LogProcessorServiceImpl();
     }
 
     @Test
@@ -62,7 +66,8 @@ class LogProcessorTest {
 
     @ParameterizedTest
     @MethodSource("provideLogDurations")
-    void testComputeDurationsAndStatuses(String pid, String expectedStatus) throws IOException, InvalidLogEntryException {
+    void testComputeDurationsAndStatuses(String pid, String expectedStatus)
+            throws IOException, InvalidLogEntryException {
         // Given
         String filePath = "src/test/resources/test_logs.log";
 

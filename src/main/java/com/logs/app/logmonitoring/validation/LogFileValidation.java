@@ -16,6 +16,6 @@ public class LogFileValidation {
         InputFormatValidator.validateTimestamp(parts[0]);
         InputFormatValidator.validateJobDescription(parts[1]);
         InputFormatValidator.validateStatus(parts[2]);
-        InputFormatValidator.validatePID(parts[3]);
+        InputFormatValidator.validatePid(parts[3]);
     }
 }

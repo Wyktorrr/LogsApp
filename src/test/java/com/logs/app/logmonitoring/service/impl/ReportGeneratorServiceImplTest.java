@@ -1,10 +1,8 @@
-package com.logs.app.logmonitoring.service;
+package com.logs.app.logmonitoring.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.logs.app.logmonitoring.model.ProcessJob;
-import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
@@ -13,8 +11,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
-class ReportGeneratorTest {
+class ReportGeneratorServiceImplTest {
 
     @Test
     void testGenerateReport() {
@@ -47,7 +46,7 @@ class ReportGeneratorTest {
         System.setOut(new PrintStream(outputStream));
 
         // When
-        ReportGenerator.generateReport(processMap);
+        ReportGeneratorServiceImpl.generateReport(processMap);
         System.setOut(originalOut);
 
         // Expected output

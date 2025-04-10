@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import org.junit.jupiter.api.Test;
 
-public class LogFileValidationTest {
+class LogFileValidationTest {
     @Test
     public void givenValidLogEntry_whenValidating_thenNoExceptionIsThrown() throws InvalidLogEntryException {
         String logEntry = "11:35:23, scheduled task 032, START, 37980";
@@ -18,7 +18,8 @@ public class LogFileValidationTest {
         String logEntry = "11:35:23, scheduled task 032, START";
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
                 () -> LogFileValidation.validateEntry(logEntry));
-        assertEquals("Log entry must have exactly four components: 11:35:23, scheduled task 032, START", exception.getMessage());
+        assertEquals("Log entry must have exactly four components: 11:35:23, scheduled task 032, START",
+                exception.getMessage());
     }
 
     @Test
@@ -46,7 +47,7 @@ public class LogFileValidationTest {
     }
 
     @Test
-    public void givenLogEntryWithInvalidPID_whenValidating_thenExceptionIsThrown() {
+    public void givenLogEntryWithInvalidPid_whenValidating_thenExceptionIsThrown() {
         String logEntry = "11:35:23, scheduled task 032, START, invalidPID";
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
                 () -> LogFileValidation.validateEntry(logEntry));

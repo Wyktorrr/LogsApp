@@ -1,13 +1,12 @@
 package com.logs.app.logmonitoring.util;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class ReportStatusEnumTest {
+class ReportStatusEnumTest {
     @Test
     public void testStatusValues() {
         List<String> expectedStatuses = Arrays.asList("COMPLETED", "ERROR", "WARNING");
@@ -21,7 +20,8 @@ public class ReportStatusEnumTest {
 
     @Test
     public void testEnumValues() {
-        ReportStatusEnum[] expectedValues = { ReportStatusEnum.COMPLETED, ReportStatusEnum.ERROR, ReportStatusEnum.WARNING };
+        ReportStatusEnum[] expectedValues =
+                { ReportStatusEnum.COMPLETED, ReportStatusEnum.ERROR, ReportStatusEnum.WARNING };
         assertEquals(expectedValues.length, ReportStatusEnum.values().length);
         for (int i = 0; i < expectedValues.length; i++) {
             assertEquals(expectedValues[i], ReportStatusEnum.values()[i]);

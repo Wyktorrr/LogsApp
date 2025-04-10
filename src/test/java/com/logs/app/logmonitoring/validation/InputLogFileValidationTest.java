@@ -1,7 +1,13 @@
 package com.logs.app.logmonitoring.validation;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import com.logs.app.logmonitoring.util.Constants;
+import com.logs.app.logmonitoring.util.TimeStatusEnum;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,9 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.logs.app.logmonitoring.util.Constants;
-import com.logs.app.logmonitoring.util.TimeStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -227,7 +230,7 @@ class InputLogFileValidationTest {
     }
 
     @Test
-    public void testJobDescriptionAndPIDConsistency() throws IOException {
+    public void testJobDescriptionAndPidConsistency() throws IOException {
         // Given: A file reader for the log file to check job description and PID
         BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH));
         Map<Integer, String> startJobDescriptions = new HashMap<>();

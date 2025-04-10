@@ -1,14 +1,14 @@
 package com.logs.app.logmonitoring.validation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import com.logs.app.logmonitoring.util.Constants;
 import com.logs.app.logmonitoring.util.TimeStatusEnum;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class InputFormatValidatorTest {
+class InputFormatValidatorTest {
     @Test
     public void testValidateTimestampValidTimestamp() throws InvalidLogEntryException {
         InputFormatValidator.validateTimestamp("11:35:23");
@@ -55,35 +55,35 @@ public class InputFormatValidatorTest {
     }
 
     @Test
-    public void testValidatePIDValidPID() throws InvalidLogEntryException {
-        InputFormatValidator.validatePID("12345");
+    public void testValidatePidValidPid() throws InvalidLogEntryException {
+        InputFormatValidator.validatePid("12345");
     }
 
     @Test
-    public void testValidatePIDEmptyPID() {
+    public void testValidatePidEmptyPid() {
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
-                () -> InputFormatValidator.validatePID(""));
+                () -> InputFormatValidator.validatePid(""));
         assertEquals(Constants.PID_NOT_EMPTY_MSJ, exception.getMessage());
     }
 
     @Test
-    public void testValidatePIDInvalidFormat() {
+    public void testValidatePidInvalidFormat() {
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
-                () -> InputFormatValidator.validatePID("abc"));
+                () -> InputFormatValidator.validatePid("abc"));
         assertEquals(Constants.PID_FORMAT_MSJ + "abc", exception.getMessage());
     }
 
     @Test
-    public void testValidatePIDNot5Digit() {
+    public void testValidatePidNot5Digit() {
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
-                () -> InputFormatValidator.validatePID("1234"));
+                () -> InputFormatValidator.validatePid("1234"));
         assertEquals(Constants.PID_FORMAT_MSJ + "1234", exception.getMessage());
     }
 
     @Test
-    public void testValidatePIDTooLongPID() {
+    public void testValidatePidTooLongPid() {
         InvalidLogEntryException exception = assertThrows(InvalidLogEntryException.class,
-                () -> InputFormatValidator.validatePID("123456"));
+                () -> InputFormatValidator.validatePid("123456"));
         assertEquals(Constants.PID_FORMAT_MSJ + "123456", exception.getMessage());
     }
 }

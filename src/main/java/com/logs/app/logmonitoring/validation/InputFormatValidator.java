@@ -3,7 +3,6 @@ package com.logs.app.logmonitoring.validation;
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import com.logs.app.logmonitoring.util.Constants;
 import com.logs.app.logmonitoring.util.TimeStatusEnum;
-
 import java.time.LocalTime;
 
 public class InputFormatValidator {
@@ -30,7 +29,7 @@ public class InputFormatValidator {
         }
     }
 
-    public static void validatePID(String pidStr) throws InvalidLogEntryException {
+    public static void validatePid(String pidStr) throws InvalidLogEntryException {
         if (pidStr.trim().isEmpty()) {
             throw new InvalidLogEntryException(Constants.PID_NOT_EMPTY_MSJ);
         }
