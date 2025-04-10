@@ -13,29 +13,35 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class LogProcessor {
-    private final Map<Integer, List<ProcessJob>> processMap = new HashMap<>();
+    private final Map<Integer, List<ProcessJob>> processMap = new ConcurrentHashMap<>();
 
-    public void parseLogs(String filePath) throws IOException, InvalidLogEntryException {
+    public void parseLogs(String filePath) throws IOException {
         long startTime = System.currentTimeMillis(); // Start timer
         List<String> logEntries = Files.readAllLines(Paths.get(filePath));
 
-        for (String logEntry : logEntries) {
-            validateEntry(logEntry);
-            ProcessJob process = createProcessJob(logEntry);
-            processMap.computeIfAbsent(process.getPid(), k -> new ArrayList<>()).add(process);
+        // Parallel processing of log entries
+        try {
+            logEntries.parallelStream().forEach(logEntry -> {
+                try {
+                    handleLogEntry(logEntry);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        } catch (Exception e) {
+            // Handle other exceptions if necessary
+            e.printStackTrace();
         }
 
         computeDurationsAndStatuses();
         long endTime = System.currentTimeMillis(); // End timer
 
-        System.out.println("Time taken for sequential processing: " + (endTime - startTime) + " ms");
+        System.out.println("Time taken for parallel processing: " + (endTime - startTime) + " ms");
     }
 
     private ProcessJob createProcessJob(String logEntry) {
@@ -92,5 +98,16 @@ public class LogProcessor {
 
     public void generateReport() {
         ReportGenerator.generateReport(processMap);
+    }
+
+    private void handleLogEntry(String logEntry) throws InterruptedException {
+        try {
+            validateEntry(logEntry);
+            ProcessJob process = createProcessJob(logEntry);
+            processMap.computeIfAbsent(process.getPid(), k -> Collections.synchronizedList(new ArrayList<>())).add(process);
+        } catch (InvalidLogEntryException e) {
+            e.printStackTrace();
+        }
+        Thread.sleep(50); // Simulating some processing time
     }
 }
