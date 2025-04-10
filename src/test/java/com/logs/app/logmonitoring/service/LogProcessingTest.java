@@ -3,11 +3,10 @@ package com.logs.app.logmonitoring.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.logs.app.logmonitoring.model.ProcessJob;
-import java.time.Duration;
-import java.time.LocalTime;
-
 import com.logs.app.logmonitoring.util.ReportStatusEnum;
 import com.logs.app.logmonitoring.util.TimeStatusEnum;
+import java.time.Duration;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,14 +41,16 @@ class LogProcessingTest {
 
     @Test
     public void testWarningStatus() {
-        Duration duration = Duration.between(mockProcessLongWarning.getStartTime(), mockProcessLongWarning.getEndTime());
+        Duration duration = Duration.between(
+                mockProcessLongWarning.getStartTime(), mockProcessLongWarning.getEndTime());
         mockProcessLongWarning.setDuration(duration);
 
         Duration expectedDuration = Duration.ofMinutes(7).plusSeconds(30);
         assertEquals(expectedDuration, mockProcessLongWarning.getDuration(),
                 "The duration should be 7 minutes and 30 seconds.");
 
-        if (mockProcessLongWarning.getDuration().toMinutes() >= 5 && mockProcessLongWarning.getDuration().toMinutes() <= 10) {
+        if (mockProcessLongWarning.getDuration().toMinutes() >= 5
+                && mockProcessLongWarning.getDuration().toMinutes() <= 10) {
             mockProcessLongWarning.setStatus(ReportStatusEnum.WARNING.name());
         } else {
             mockProcessLongWarning.setStatus(ReportStatusEnum.COMPLETED.name());

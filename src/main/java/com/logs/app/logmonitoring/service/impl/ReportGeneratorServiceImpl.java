@@ -1,12 +1,11 @@
-package com.logs.app.logmonitoring.service;
+package com.logs.app.logmonitoring.service.impl;
 
 import com.logs.app.logmonitoring.model.ProcessJob;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-public class ReportGenerator {
+public class ReportGeneratorServiceImpl {
     public static void generateReport(Map<Integer, List<ProcessJob>> processMap) {
         System.out.println("Job Report");
         System.out.println("---------------------------------------------------------");

@@ -1,11 +1,11 @@
 package com.logs.app.logmonitoring.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class TimeStatusEnumTest {
+class TimeStatusEnumTest {
     @ParameterizedTest
     @EnumSource(TimeStatusEnum.class)
     public void testTimeStatusEnum(TimeStatusEnum status) {

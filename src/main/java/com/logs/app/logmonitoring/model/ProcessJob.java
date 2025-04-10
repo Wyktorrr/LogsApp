@@ -1,13 +1,12 @@
 package com.logs.app.logmonitoring.model;
 
 import com.logs.app.logmonitoring.util.Constants;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Objects;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

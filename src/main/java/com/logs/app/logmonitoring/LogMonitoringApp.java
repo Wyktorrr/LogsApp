@@ -1,10 +1,10 @@
 package com.logs.app.logmonitoring;
 
-import com.logs.app.logmonitoring.service.LogProcessor;
+import com.logs.app.logmonitoring.service.impl.LogProcessorServiceImpl;
 
 public class LogMonitoringApp {
     public static void main(String[] args) {
-        LogProcessor logProcessor = new LogProcessor();
+        LogProcessorServiceImpl logProcessor = new LogProcessorServiceImpl();
 
         // Specify the path to desired logs.log file
         String logFilePath = "src/main/resources/logs.log";

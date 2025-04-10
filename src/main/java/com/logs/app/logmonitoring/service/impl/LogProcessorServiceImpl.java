@@ -1,13 +1,12 @@
-package com.logs.app.logmonitoring.service;
+package com.logs.app.logmonitoring.service.impl;
 
 import static com.logs.app.logmonitoring.validation.LogFileValidation.validateEntry;
 
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import com.logs.app.logmonitoring.model.ProcessJob;
+import com.logs.app.logmonitoring.service.LogProcessorService;
 import com.logs.app.logmonitoring.util.ReportStatusEnum;
 import com.logs.app.logmonitoring.util.TimeStatusEnum;
-import lombok.Getter;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,9 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
 
 @Getter
-public class LogProcessor {
+public class LogProcessorServiceImpl implements LogProcessorService {
     private final Map<Integer, List<ProcessJob>> processMap = new HashMap<>();
 
     public void parseLogs(String filePath) throws IOException, InvalidLogEntryException {
@@ -38,7 +38,7 @@ public class LogProcessor {
         System.out.println("Time taken for sequential processing: " + (endTime - startTime) + " ms");
     }
 
-    private ProcessJob createProcessJob(String logEntry) {
+    public ProcessJob createProcessJob(String logEntry) {
         String[] parts = logEntry.split(",\\s*");
         LocalTime timestamp = LocalTime.parse(parts[0]);
         String jobDescription = parts[1];
@@ -55,7 +55,7 @@ public class LogProcessor {
                 .build();
     }
 
-    private void computeDurationsAndStatuses() {
+    public void computeDurationsAndStatuses() {
         for (List<ProcessJob> processes : processMap.values()) {
             ProcessJob startProcess = null;
             ProcessJob endProcess = null;
@@ -91,6 +91,6 @@ public class LogProcessor {
     }
 
     public void generateReport() {
-        ReportGenerator.generateReport(processMap);
+        ReportGeneratorServiceImpl.generateReport(processMap);
     }
 }
