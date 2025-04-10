@@ -14,28 +14,69 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 @Getter
 public class LogProcessor {
-    private final Map<Integer, List<ProcessJob>> processMap = new HashMap<>();
+    private final Map<Integer, List<ProcessJob>> processMap = new ConcurrentHashMap<>();
 
-    public void parseLogs(String filePath) throws IOException, InvalidLogEntryException {
+    public void parseLogs(String filePath) throws IOException {
         long startTime = System.currentTimeMillis(); // Start timer
         List<String> logEntries = Files.readAllLines(Paths.get(filePath));
 
-        for (String logEntry : logEntries) {
-            validateEntry(logEntry);
-            ProcessJob process = createProcessJob(logEntry);
-            processMap.computeIfAbsent(process.getPid(), k -> new ArrayList<>()).add(process);
-        }
+        // Create a ForkJoinPool
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        // Execute the ForkJoinTask
+        forkJoinPool.invoke(new LogEntryTask(logEntries));
 
         computeDurationsAndStatuses();
         long endTime = System.currentTimeMillis(); // End timer
 
-        System.out.println("Time taken for sequential processing: " + (endTime - startTime) + " ms");
+        System.out.println("Time taken for ForkJoin processing: " + (endTime - startTime) + " ms");
+    }
+
+    private class LogEntryTask extends RecursiveTask<Void> {
+        private static final int THRESHOLD = 100; // Define a threshold
+        private final List<String> logEntries;
+
+        public LogEntryTask(List<String> logEntries) {
+            this.logEntries = logEntries;
+        }
+
+        @Override
+        protected Void compute() {
+            if (logEntries.size() <= THRESHOLD) {
+                // Process directly if below threshold
+                logEntries.forEach(logEntry -> {
+                    try {
+                        validateEntry(logEntry);
+                        ProcessJob process = createProcessJob(logEntry);
+                        processMap.computeIfAbsent(process.getPid(), k -> Collections.synchronizedList(new ArrayList<>())).add(process);
+                    } catch (InvalidLogEntryException e) {
+                        // Handle the exception according to your application's needs
+                        e.printStackTrace();
+                    }
+                });
+            } else {
+                // Split the task into two subtasks
+                int mid = logEntries.size() / 2;
+                LogEntryTask leftTask = new LogEntryTask(logEntries.subList(0, mid));
+                LogEntryTask rightTask = new LogEntryTask(logEntries.subList(mid, logEntries.size()));
+
+                // Fork the left task and compute the right task in the current thread
+                leftTask.fork();
+                rightTask.compute();
+
+                // Join the left task
+                leftTask.join();
+            }
+            return null;
+        }
     }
 
     private ProcessJob createProcessJob(String logEntry) {
