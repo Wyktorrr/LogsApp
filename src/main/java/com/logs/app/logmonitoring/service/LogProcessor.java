@@ -1,7 +1,11 @@
 package com.logs.app.logmonitoring.service;
 
+import static com.logs.app.logmonitoring.validation.LogFileValidation.validateEntry;
+
 import com.logs.app.logmonitoring.exception.InvalidLogEntryException;
 import com.logs.app.logmonitoring.model.ProcessJob;
+import com.logs.app.logmonitoring.util.ReportStatusEnum;
+import com.logs.app.logmonitoring.util.TimeStatusEnum;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -14,13 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.logs.app.logmonitoring.validation.LogFileValidation.validateEntry;
-
 @Getter
 public class LogProcessor {
     private final Map<Integer, List<ProcessJob>> processMap = new HashMap<>();
 
     public void parseLogs(String filePath) throws IOException, InvalidLogEntryException {
+        long startTime = System.currentTimeMillis(); // Start timer
         List<String> logEntries = Files.readAllLines(Paths.get(filePath));
 
         for (String logEntry : logEntries) {
@@ -30,6 +33,9 @@ public class LogProcessor {
         }
 
         computeDurationsAndStatuses();
+        long endTime = System.currentTimeMillis(); // End timer
+
+        System.out.println("Time taken for sequential processing: " + (endTime - startTime) + " ms");
     }
 
     private ProcessJob createProcessJob(String logEntry) {
@@ -55,9 +61,9 @@ public class LogProcessor {
             ProcessJob endProcess = null;
 
             for (ProcessJob process : processes) {
-                if ("START".equals(process.getStatus())) {
+                if (TimeStatusEnum.START.name().equals(process.getStatus())) {
                     startProcess = process;
-                } else if ("END".equals(process.getStatus())) {
+                } else if (TimeStatusEnum.END.name().equals(process.getStatus())) {
                     endProcess = process;
                 }
             }
@@ -71,14 +77,14 @@ public class LogProcessor {
                 // Set status based on total seconds
                 long seconds = duration.getSeconds();
                 if (seconds > 600) {  // More than 10 minutes
-                    startProcess.setStatus("ERROR");
-                    endProcess.setStatus("ERROR");
+                    startProcess.setStatus(ReportStatusEnum.ERROR.name());
+                    endProcess.setStatus(ReportStatusEnum.ERROR.name());
                 } else if (seconds >= 300) { // More than 5 minutes
-                    startProcess.setStatus("WARNING");
-                    endProcess.setStatus("WARNING");
+                    startProcess.setStatus(ReportStatusEnum.WARNING.name());
+                    endProcess.setStatus(ReportStatusEnum.WARNING.name());
                 } else {
-                    startProcess.setStatus("COMPLETED");
-                    endProcess.setStatus("COMPLETED");
+                    startProcess.setStatus(ReportStatusEnum.COMPLETED.name());
+                    endProcess.setStatus(ReportStatusEnum.COMPLETED.name());
                 }
             }
         }

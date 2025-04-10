@@ -5,95 +5,89 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.logs.app.logmonitoring.model.ProcessJob;
 import java.time.Duration;
 import java.time.LocalTime;
+
+import com.logs.app.logmonitoring.util.ReportStatusEnum;
+import com.logs.app.logmonitoring.util.TimeStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LogProcessingTest {
-    private ProcessJob mockProcessLongWarning; // Process with duration leading to WARNING
-    private ProcessJob mockProcessLongError;   // Process with duration leading to ERROR
-    private ProcessJob mockProcessShort;       // Process with duration less than 5 minutes
+    private ProcessJob mockProcessLongWarning;
+    private ProcessJob mockProcessLongError;
+    private ProcessJob mockProcessShort;
 
     @BeforeEach
     public void setUp() {
-        // Given: Initializing mock ProcessJob objects
         mockProcessLongWarning = new ProcessJob("scheduled task 001", 12345,
-                LocalTime.of(11, 0, 0),  // START time
-                LocalTime.of(11, 7, 30), // END time (7 minutes and 30 seconds)
-                null, // Duration will be computed
-                "START"
+                LocalTime.of(11, 0, 0),
+                LocalTime.of(11, 7, 30),
+                null,
+                TimeStatusEnum.START.name()
         );
 
         mockProcessLongError = new ProcessJob("scheduled task 002", 12346,
-                LocalTime.of(11, 0, 0),  // START time
-                LocalTime.of(11, 11, 30), // END time (11 minutes and 30 seconds)
-                null, // Duration will be computed
-                "START"
+                LocalTime.of(11, 0, 0),
+                LocalTime.of(11, 11, 30),
+                null,
+                TimeStatusEnum.START.name()
         );
 
         mockProcessShort = new ProcessJob("scheduled task 003", 12347,
-                LocalTime.of(11, 0, 0),  // START time
-                LocalTime.of(11, 4, 30), // END time (4 minutes and 30 seconds)
-                null,                     // Duration will be computed
-                "START"
+                LocalTime.of(11, 0, 0),
+                LocalTime.of(11, 4, 30),
+                null,
+                TimeStatusEnum.START.name()
         );
     }
 
     @Test
     public void testWarningStatus() {
-        // Given: Setup for the process with warning status
-        // When: Calculating duration
         Duration duration = Duration.between(mockProcessLongWarning.getStartTime(), mockProcessLongWarning.getEndTime());
         mockProcessLongWarning.setDuration(duration);
 
-        // Then: Expect the status to be "WARNING"
-        Duration expectedDuration = Duration.ofMinutes(7).plusSeconds(30); // 7 minutes 30 seconds
-        assertEquals(expectedDuration, mockProcessLongWarning.getDuration(), "The duration should be 7 minutes and 30 seconds.");
+        Duration expectedDuration = Duration.ofMinutes(7).plusSeconds(30);
+        assertEquals(expectedDuration, mockProcessLongWarning.getDuration(),
+                "The duration should be 7 minutes and 30 seconds.");
 
-        // Then: Determine and assert the status based on the calculated duration
         if (mockProcessLongWarning.getDuration().toMinutes() >= 5 && mockProcessLongWarning.getDuration().toMinutes() <= 10) {
-            mockProcessLongWarning.setStatus("WARNING");
+            mockProcessLongWarning.setStatus(ReportStatusEnum.WARNING.name());
         } else {
-            mockProcessLongWarning.setStatus("COMPLETED");
+            mockProcessLongWarning.setStatus(ReportStatusEnum.COMPLETED.name());
         }
 
-        assertEquals("WARNING", mockProcessLongWarning.getStatus(), "The status should be WARNING based on the duration.");
+        assertEquals(ReportStatusEnum.WARNING.name(), mockProcessLongWarning.getStatus(),
+                "The status should be WARNING based on the duration.");
     }
 
     @Test
     public void testErrorStatus() {
-        // Given: Setup for the process with error status
-        // When: Calculating duration
         Duration duration = Duration.between(mockProcessLongError.getStartTime(), mockProcessLongError.getEndTime());
         mockProcessLongError.setDuration(duration);
 
-        // Then: Expect the status to be "ERROR"
         if (mockProcessLongError.getDuration().toMinutes() > 10) {
-            mockProcessLongError.setStatus("ERROR");
+            mockProcessLongError.setStatus(ReportStatusEnum.ERROR.name());
         } else {
-            mockProcessLongError.setStatus("COMPLETED");
+            mockProcessLongError.setStatus(ReportStatusEnum.COMPLETED.name());
         }
 
-        assertEquals("ERROR", mockProcessLongError.getStatus(), "The status should be ERROR for exceeding 10 minutes.");
+        assertEquals(ReportStatusEnum.ERROR.name(), mockProcessLongError.getStatus(),
+                "The status should be ERROR for exceeding 10 minutes.");
     }
 
     @Test
     public void testShortProcessStatus() {
-        // Given: Setup for a short process (less than 5 min)
-        // When: Calculate the duration for mockProcessShort
         Duration duration = Duration.between(mockProcessShort.getStartTime(), mockProcessShort.getEndTime());
         mockProcessShort.setDuration(duration);
 
-        // Check the duration is set correctly
-        Duration expectedShortDuration = Duration.ofMinutes(4).plusSeconds(30); // 4 minutes and 30 seconds
-        assertEquals(expectedShortDuration, mockProcessShort.getDuration(), "The duration should be 4 minutes and 30 seconds.");
+        Duration expectedShortDuration = Duration.ofMinutes(4).plusSeconds(30);
+        assertEquals(expectedShortDuration, mockProcessShort.getDuration(),
+                "The duration should be 4 minutes and 30 seconds.");
 
-        // Determine and set the status based on the computed duration
         if (mockProcessShort.getDuration().toMinutes() < 5) {
-            mockProcessShort.setStatus("COMPLETED");
+            mockProcessShort.setStatus(ReportStatusEnum.COMPLETED.name());
         }
 
-        // Then: Expect the status to pe "COMPLETED"
-        // Assert that the status should be COMPLETED
-        assertEquals("COMPLETED", mockProcessShort.getStatus(), "The status should be COMPLETED for durations less than 5 minutes.");
+        assertEquals(ReportStatusEnum.COMPLETED.name(), mockProcessShort.getStatus(),
+                "The status should be COMPLETED for durations less than 5 minutes.");
     }
 }
