@@ -1,5 +1,6 @@
 package com.logs.app.logmonitoring.model;
 
+import com.logs.app.logmonitoring.util.Constants;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class ProcessJob {
 
     public ProcessJob(String jobDescription, int pid, LocalTime startTime,
                       LocalTime endTime, Duration duration, String status) {
-        this.jobDescription = Objects.requireNonNull(jobDescription, "Job description cannot be null");
+        this.jobDescription = Objects.requireNonNull(jobDescription, Constants.NOT_NULL_JOB_DESCRIPTION_MSJ);
         this.pid = pid;
         this.startTime = startTime; // Allowing null for start or end times for flexibility
         this.endTime = endTime;      // Allowing null for start or end times for flexibility

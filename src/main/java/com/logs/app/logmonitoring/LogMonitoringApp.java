@@ -6,7 +6,7 @@ public class LogMonitoringApp {
     public static void main(String[] args) {
         LogProcessor logProcessor = new LogProcessor();
 
-        // Specify the path to your logs.log file
+        // Specify the path to desired logs.log file
         String logFilePath = "src/main/resources/logs.log";
 
         try {
